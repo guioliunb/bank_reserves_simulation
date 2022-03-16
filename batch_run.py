@@ -24,48 +24,47 @@ every step of every run.
 """
 
 from bank_reserves.agents import Bank, Person
-import itertools
 from mesa import Model
+from mesa.batchrunner import BatchRunner
 from mesa.batchrunner import batch_run
 from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
 from mesa.time import RandomActivation
 import numpy as np
+from datetime import datetime
 import pandas as pd
 
 # Start of datacollector functions
 
 
+
 def get_num_rich_agents(model):
-    """list of rich agents"""
+    """return number of rich agents"""
 
     rich_agents = [a for a in model.schedule.agents if a.savings > model.rich_threshold]
-    # return number of rich agents
     return len(rich_agents)
 
 
 def get_num_poor_agents(model):
-    """list of poor agents"""
+    """return number of poor agents"""
 
-    poor_agents = [a for a in model.schedule.agents if a.loans > 10]
-    # return number of poor agents
+    poor_agents = [a for a in model.schedule.agents if a.loans > 25]
     return len(poor_agents)
 
 
 def get_num_mid_agents(model):
-    """list of middle class agents"""
+    """return number of middle class agents"""
 
     mid_agents = [
         a
         for a in model.schedule.agents
-        if a.loans < 10 and a.savings < model.rich_threshold
+        if a.loans < 25 and a.savings < model.rich_threshold
     ]
-    # return number of middle class agents
     return len(mid_agents)
-
+  
 
 def get_total_savings(model):
-    """list of amounts of all agents' savings"""
+    """sum of all agents' savings"""
 
     agent_savings = [a.savings for a in model.schedule.agents]
     # return the sum of agents' savings
@@ -73,7 +72,7 @@ def get_total_savings(model):
 
 
 def get_total_wallets(model):
-    """list of amounts of all agents' wallets"""
+    """sum of amounts of all agents' wallets"""
 
     agent_wallets = [a.wallet for a in model.schedule.agents]
     # return the sum of all agents' wallets
@@ -81,8 +80,7 @@ def get_total_wallets(model):
 
 
 def get_total_money(model):
-    """sum of all agents' wallets"""
-
+    # sum of all agents' wallets
     wallet_money = get_total_wallets(model)
     # sum of all agents' savings
     savings_money = get_total_savings(model)
@@ -91,24 +89,30 @@ def get_total_money(model):
 
 
 def get_total_loans(model):
-    """list of amounts of all agents' loans"""
-
+    # list of amounts of all agents' loans
     agent_loans = [a.loans for a in model.schedule.agents]
     # return sum of all agents' loans
     return np.sum(agent_loans)
+  
 
 
-def track_params(model):
-    return (model.init_people, model.rich_threshold, model.reserve_percent)
-
-
-def track_run(model):
-    return model.uid
-
-
-class BankReservesModel(Model):
-    # id generator to track run number in batch run data
-    id_gen = itertools.count(1)
+class BankReserves(Model):
+    """
+    This model is a Mesa implementation of the Bank Reserves model from NetLogo.
+    It is a highly abstracted, simplified model of an economy, with only one
+    type of agent and a single bank representing all banks in an economy. People
+    (represented by circles) move randomly within the grid. If two or more people
+    are on the same grid location, there is a 50% chance that they will trade with
+    each other. If they trade, there is an equal chance of giving the other agent
+    $5 or $2. A positive trade balance will be deposited in the bank as savings.
+    If trading results in a negative balance, the agent will try to withdraw from
+    its savings to cover the balance. If it does not have enough savings to cover
+    the negative balance, it will take out a loan from the bank to cover the
+    difference. The bank is required to keep a certain percentage of deposits as
+    reserves and the bank's ability to loan at any given time is a function of
+    the amount of deposits, its reserves, and its current total outstanding loan
+    amount.
+    """
 
     # grid height
     grid_h = 20
@@ -122,11 +126,10 @@ class BankReservesModel(Model):
         self,
         height=grid_h,
         width=grid_w,
-        init_people=2,
-        rich_threshold=10,
-        reserve_percent=50,
+        init_people=10,
+        rich_threshold=100,
+        reserve_percent=10,
     ):
-        self.uid = next(self.id_gen)
         self.height = height
         self.width = width
         self.init_people = init_people
@@ -145,10 +148,8 @@ class BankReservesModel(Model):
                 "Wallets": get_total_wallets,
                 "Money": get_total_money,
                 "Loans": get_total_loans,
-                "Model Params": track_params,
-                "Run": track_run,
             },
-            agent_reporters={"Wealth": "wealth"},
+            agent_reporters={"Wealth": "wealth"}
         )
 
         # create a single bank for the model
@@ -156,9 +157,8 @@ class BankReservesModel(Model):
 
         # create people for the model according to number of people set by user
         for i in range(self.init_people):
-            # set x coordinate as a random number within the width of the grid
+            # set x, y coords randomly within the grid
             x = self.random.randrange(self.width)
-            # set y coordinate as a random number within the height of the grid
             y = self.random.randrange(self.height)
             p = Person(i, (x, y), self, True, self.bank, self.rich_threshold)
             # place the Person object on the grid at coordinates (x, y)
@@ -167,53 +167,55 @@ class BankReservesModel(Model):
             self.schedule.add(p)
 
         self.running = True
-
-    def step(self):
-        # collect data
         self.datacollector.collect(self)
+    
+
+    
+    def step(self):
         # tell all the agents in the model to run their step function
         self.schedule.step()
+        # collect data
+        self.datacollector.collect(self)
+        #self deposits
+
+        
+   
 
     def run_model(self):
         for i in range(self.run_time):
             self.step()
-
-
-# parameter lists for each parameter to be tested in batch run
-br_params = {
-    "init_people": [25, 100],
-    "rich_threshold": [5, 10],
-    "reserve_percent": 5,
-}
-
+            
+            
 if __name__ == "__main__":
-    data = batch_run(
-        BankReservesModel,
-        br_params,
-        model_reporters={"Rich": get_num_rich_agents},
-        agent_reporters={"Wealth": "wealth"},
-    )
-    br_df = pd.DataFrame(data)
-    br_df.to_csv("BankReservesModel_Data.csv")
+    variable_params={
+        "width": [20],
+        "height": [20],
+        "init_people":  [25, 35],
+        "rich_threshold" :  [50, 150],
+        "reserve_percent" :  [10, 60],
+    }
+    
+    
+    batch_runner = batch_run(
+        BankReserves,
+        parameters= variable_params,
+        iterations= 5,
+        max_steps=30,
+        number_processes=1,
+        data_collection_period=1,
+        display_progress=True,
 
-    # The commented out code below is the equivalent code as above, but done
-    # via the legacy BatchRunner class. This is a good example to look at if
-    # you want to migrate your code to use `batch_run()` from `BatchRunner`.
-    """
-    br = BatchRunner(
-        BankReservesModel,
-        br_params,
-        iterations=2,
-        max_steps=1000,
-        nr_processes=None,
-        # model_reporters={"Data Collector": lambda m: m.datacollector},
+            
     )
-    br.run_all()
-    br_df = br.get_model_vars_dataframe()
-    br_step_data = pd.DataFrame()
-    for i in range(len(br_df["Data Collector"])):
-        if isinstance(br_df["Data Collector"][i], DataCollector):
-            i_run_data = br_df["Data Collector"][i].get_model_vars_dataframe()
-            br_step_data = br_step_data.append(i_run_data, ignore_index=True)
-    br_step_data.to_csv("BankReservesModel_Step_Data.csv")
-    """
+    
+    results_df = pd.DataFrame(batch_runner)
+    
+    now = datetime.now().strftime("%Y-%m-%d")
+    file_name_suffix =  ("iter"+str(10)+
+                        "steps"+str(100)+"lower_firemans"+now
+                        )
+    
+    results_df.to_csv("model_data4"+file_name_suffix+".csv")
+
+  
+        
