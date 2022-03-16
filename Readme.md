@@ -73,9 +73,7 @@ Para atualizar os parâmetros para testar outras varreduras de parâmetros, edit
 
 ## Arquivos
 
-* ``bank_reserves/random_walker.py``: 149 / 5.000
-Resultados de tradução
-Isso define uma classe que herda da classe Mesa Agent. O objetivo principal é fornecer um método para que os agentes se movam aleatoriamente uma célula por vez. 
+* ``bank_reserves/random_walker.py``: Isso define uma classe que herda da classe Mesa Agent. O objetivo principal é fornecer um método para que os agentes se movam aleatoriamente uma célula por vez. 
 * ``bank_reserves/agents.py``: Define a classe Pessoa e Banco.
 * ``bank_reserves/model.py``: Define o modelo do Banco e as funções DataCollector.
 * ``bank_reserves/server.py``: Configura o servidor de visualização interativa.
