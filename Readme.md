@@ -1,58 +1,90 @@
-# Bank Reserves Model
+# Modelo de Reservas Bancárias 
 
-## Summary
+## Resumo
 
-A highly abstracted, simplified model of an economy, with only one type of agent and a single bank representing all banks in an economy. People (represented by circles) move randomly within the grid. If two or more people are on the same grid location, there is a 50% chance that they will trade with each other. If they trade, there is an equal chance of giving the other agent $5 or $2. A positive trade balance will be deposited in the bank as savings. If trading results in a negative balance, the agent will try to withdraw from its savings to cover the balance. If it does not have enough savings to cover the negative balance, it will take out a loan from the bank to cover the difference. The bank is required to keep a certain percentage of deposits as reserves. If run.py is used to run the model, then the percent of deposits the bank is required to retain is a user settable parameter. The amount the bank is able to loan at any given time is a function of the amount of deposits, its reserves, and its current total outstanding loan amount.
+Um modelo altamente abstrato e simplificado de uma economia, com apenas um tipo de agente e um único banco representando todos os bancos de uma economia. As pessoas (representadas por círculos) se movem aleatoriamente dentro da grade. Se duas ou mais pessoas estiverem no mesmo local da grade, há 50% de chance de que elas negociem entre si. 
 
-The model demonstrates the following Mesa features:
- - MultiGrid for creating shareable space for agents
- - DataCollector for collecting data on individual model runs
- - UserSettableParameters for adjusting initial model parameters
- - ModularServer for visualization of agent interaction
- - Agent object inheritance
- - Using a BatchRunner to collect data on multiple combinations of model parameters
+-Um saldo comercial positivo será depositado no banco como poupança. Se a negociação resultar em saldo negativo, o agente tentará sacar de suas economias para cobrir o saldo. 
+Se não tiver poupança suficiente para cobrir o saldo negativo, fará um empréstimo junto ao banco para cobrir a diferença.
 
-## Installation
 
-To install the dependencies use pip and the requirements.txt in this directory. e.g.
+Hipóteses:
+-- Os valores de monetários agora possuem 4 chances de negociação entre os agentes. Com os valores atualizados para: $10, $20, $50, $10.
+-- Cada empréstimo feito pelo Agente terá parte do valor descontado por imposto requerido pelo Governo da simulação.
+-- Cada pagamento recebido terá parte do valor descontado por imposto requerido pelo Governo da simulação.
+
+
+Explicação 1: Dessa forma, com a maior diferenciação dos valores de negociação, em hipótese, juntamente com o fluxo de saída de imposto ocasionará maior desigualdade entre os agentes.
+
+
+-- Essa taxa de imposto considera valores individuais para cada agente entre o intervalo de 1% a 25%.
+
+Explicação 2: O banco é obrigado a manter uma certa porcentagem dos depósitos como reservas. 
+
+-- Essa reserva entretanto pode ser reduzida até 1% com as hipóteses citadas promoverá maior transferência dos valores entre os agentes, contudo concentrando em maior quantidade de ricos/pobres e diminuição dos valores médios.
+-- O pensamento contrário também é válido. Assim a reserva do banco ajuda os agentes na manutenção dos seus valores, assim ajudand numa tendência média.
+
+Explicação 3: No sentido contrário da arrecadação de impostos temos uma ação de manutençaõ financiera do sistema pelo governo.
+
+-- Quando o percentual de agentes na classificação pobre alcançar o valor definido de 20% então o governo auxiliará nos depósitos bancários em taxas de 15% até que a população de agentes se distribua melhor entre as outras duas classes.
+-- Assim, o governo atua como um 3º elemento com fator negativo: imposto e fator positivo: auxílio de crédito.
+
+
+Execução:
+Se run.py for usado para executar o modelo, a porcentagem de depósitos que o banco deve reter é um parâmetro configurável pelo usuário. O valor que o banco pode emprestar a qualquer momento é uma função do valor dos depósitos, suas reservas e o valor total do empréstimo atual.
+
+Ferramentas Mesa :
+ - MultiGrid para criar espaço compartilhável para agentes
+ - DataCollector para coletar dados em execuções de modelos individuais
+ - UserSettableParameters para ajustar os parâmetros iniciais do modelo
+ - ModularServer para visualização da interação do agente
+ - Herança de objeto do agente
+ - Usando BatchRunner para coletar dados em várias combinações de parâmetros do modelo
+
+## Instalação
+
+Para instalar as dependências use o pip e o requirements.txt neste diretório. por exemplo.
 
 ```
     $ pip install -r requirements.txt
 ```
 
-## Interactive Model Run
+## Execução interativa do modelo
 
-To run the model interactively, use `mesa runserver` in this directory:
+Para executar o modelo interativamente, use `mesa runserver` neste diretório:
 
 ```
     $ mesa runserver
 ```
 
-Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/), select the model parameters, press Reset, then Start.
+Abra o navegador no urk [http://127.0.0.1:8521/](http://127.0.0.1:8521/), sslecione os parâmetros do modelo, pressione Reset, depois Start.
 
-## Batch Run
+## Execução em lote
 
-To run the model as a batch run to collect data on multiple combinations of model parameters, run "batch_run.py" in this directory.
+Para executar o modelo como uma execução em lote para coletar dados em várias combinações de parâmetros do modelo, execute "batch_run.py" nesse diretório.
 
 ```
     $ python batch_run.py
 ```
-A progress status bar will display.
+Uma barra de progresso aparecerá.
 
-To update the parameters to test other parameter sweeps, edit the list of parameters in the dictionary named "br_params" in "batch_run.py".
+Para atualizar os parâmetros para testar outras varreduras de parâmetros, edite a lista de parâmetros no dicionário denominado "br_params" no "batch_run.py".
 
-## Files
+## Arquivos
 
-* ``bank_reserves/random_walker.py``: This defines a class that inherits from the Mesa Agent class. The main purpose is to provide a method for agents to move randomly one cell at a time.
-* ``bank_reserves/agents.py``: Defines the People and Bank classes.
-* ``bank_reserves/model.py``: Defines the Bank Reserves model and the DataCollector functions.
-* ``bank_reserves/server.py``: Sets up the interactive visualization server.
-* ``run.py``: Launches a model visualization server.
-* ``batch_run.py``: Basically the same as model.py, but includes a Mesa BatchRunner. The result of the batch run will be a .csv file with the data from every step of every run.
+* ``bank_reserves/random_walker.py``: 149 / 5.000
+Resultados de tradução
+Isso define uma classe que herda da classe Mesa Agent. O objetivo principal é fornecer um método para que os agentes se movam aleatoriamente uma célula por vez. 
+* ``bank_reserves/agents.py``: Define a classe Pessoa e Banco.
+* ``bank_reserves/model.py``: Define o modelo do Banco e as funções DataCollector.
+* ``bank_reserves/server.py``: Configura o servidor de visualização interativa.
+* ``run.py``: Inicia um servidor de visualização de modelo.
+* ``batch_run.py``: Basicamente o mesmo que model.py, mas inclui um Mesa BatchRunner. O resultado da execução em lote será um arquivo .csv com os dados de cada etapa de cada execução.
 
-## Further Reading
+## Referência em inglês:
 
 This model is a Mesa implementation of the Bank Reserves model from NetLogo:
 
 Wilensky, U. (1998). NetLogo Bank Reserves model. http://ccl.northwestern.edu/netlogo/models/BankReserves. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
 
+"# bank_reserves_simulation" 
