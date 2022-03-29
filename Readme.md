@@ -12,6 +12,7 @@ Hipóteses:
 - Os valores de monetários agora possuem 4 chances de negociação entre os agentes. Com os valores atualizados para: $10, $20, $50, $10.
 - Cada empréstimo feito pelo Agente terá parte do valor descontado por imposto requerido pelo Governo da simulação.
 - Cada pagamento recebido terá parte do valor descontado por imposto requerido pelo Governo da simulação.
+- O governo atua como um 3º agente no modelo. Assim sua contribuição será ponderada como hipóteses podendo ser positiva(auxílio de crédito) e/ou negativa(impostos).
 
 
 Explicação 1: Dessa forma, com a maior diferenciação dos valores de negociação, em hipótese, juntamente com o fluxo de saída de imposto ocasionará maior desigualdade entre os agentes.
