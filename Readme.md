@@ -31,6 +31,8 @@ Explicação 3 (Colaboração do governo): No sentido contrário da arrecadaçã
 
 - Assim, o governo atua como um 3º elemento com fator negativo: imposto e fator positivo: auxílio de crédito.
 
+OBS: O repositório ainda possui 2 arquivos de modelo, pois uma melhora na ação de crédito do banco é funcional mas estava incompatível com os tipos de dados recebidos no batch_run (provavelmente por ser float).
+
 
 Execução:
 Se run.py for usado para executar o modelo, a porcentagem de depósitos que o banco deve reter é um parâmetro configurável pelo usuário. O valor que o banco pode emprestar a qualquer momento é uma função do valor dos depósitos, suas reservas e o valor total do empréstimo atual.
