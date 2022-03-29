@@ -22,11 +22,11 @@ Explicação 2: O banco é obrigado a manter uma certa porcentagem dos depósito
 
 - Essa reserva entretanto pode ser reduzida até 1% com as hipóteses citadas promoverá maior transferência dos valores entre os agentes, contudo concentrando em maior quantidade de ricos/pobres e diminuição dos valores médios.
 
-- O pensamento contrário também é válido. Assim a reserva do banco ajuda os agentes na manutenção dos seus valores, assim ajudand numa tendência média.
+- O pensamento contrário também é válido. Assim a reserva do banco ajuda os agentes na manutenção dos seus valores, assim ajudando numa tendência média.
 
-Explicação 3: No sentido contrário da arrecadação de impostos temos uma ação de manutençaõ financiera do sistema pelo governo.
+Explicação 3: No sentido contrário da arrecadação de impostos temos uma ação de manutençaõ financeira do sistema pelo governo.
 
-- Quando o percentual de agentes na classificação pobre alcançar o valor definido de 20% então o governo auxiliará nos depósitos bancários em taxas de 15% até que a população de agentes se distribua melhor entre as outras duas classes.
+- Quando o percentual de agentes na classificação pobre alcançar o valor definido de 20% então o governo auxiliará nos depósitos bancários em taxas de 15% até que a população de agentes se distribua melhor entre as outras duas classes (exceção da classe pobre).
 
 - Assim, o governo atua como um 3º elemento com fator negativo: imposto e fator positivo: auxílio de crédito.
 
