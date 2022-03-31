@@ -3,7 +3,6 @@ from mesa.visualization.modules import CanvasGrid, ChartModule
 from mesa.visualization.UserParam import UserSettableParameter
 from bank_reserves.agents import Person
 from bank_reserves.model import BankReserves
-
 """
 Citation:
 The following code was adapted from server.py at
@@ -42,9 +41,12 @@ def person_portrayal(agent):
             color = MID_COLOR
         if agent.loans > 20:
             color = POOR_COLOR
+        if agent.model.bank.bank_to_loan < 300:
+            color = "#000000"
 
         portrayal["Color"] = color
-
+    
+        
     return portrayal
 
 
@@ -69,10 +71,19 @@ model_params = {
         100,
         description="Percent of deposits the bank has to hold in reserve",
     ),
+    "taxation": UserSettableParameter(
+        "slider",
+        "Taxation",
+        10,
+        1,
+        100,
+        description="Percent of taxes the bank has to hold on specific transactions",
+    ),
 }
 
 # set the portrayal function and size of the canvas for visualization
 canvas_element = CanvasGrid(person_portrayal, 20, 20, 500, 500)
+
 
 # map data to chart in the ChartModule
 chart_element = ChartModule(
@@ -82,7 +93,6 @@ chart_element = ChartModule(
         {"Label": "Middle Class", "Color": MID_COLOR},
     ]
 )
-
 # create instance of Mesa ModularServer
 server = ModularServer(
     BankReserves,
@@ -90,3 +100,8 @@ server = ModularServer(
     "Bank Reserves Model",
     model_params=model_params,
 )
+
+
+
+
+server.launch()

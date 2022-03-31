@@ -1,22 +1,17 @@
-"""
-The following code was adapted from the Bank Reserves model included in Netlogo
-Model information can be found at: http://ccl.northwestern.edu/netlogo/models/BankReserves
-Accessed on: November 2, 2017
-Author of NetLogo code:
-    Wilensky, U. (1998). NetLogo Bank Reserves model.
-    http://ccl.northwestern.edu/netlogo/models/BankReserves.
-    Center for Connected Learning and Computer-Based Modeling,
-    Northwestern University, Evanston, IL.
-"""
 
+  
 from bank_reserves.agents import Bank, Person
 from mesa import Model
 from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
 from mesa.time import RandomActivation
 import numpy as np
+from mesa.batchrunner import BatchRunner
+from datetime import datetime
+import matplotlib.pyplot as plt
 
-
+all_wealth = []
+  
 """
 If you want to perform a parameter sweep, call batch_run.py instead of run.py.
 For details see batch_run.py in the same directory as run.py.
@@ -37,11 +32,6 @@ def get_num_poor_agents(model):
 
     poor_agents = [a for a in model.schedule.agents if a.loans > 25]
     return len(poor_agents)
-  
-def poor_percentage(model):
-  
-    percentage = get_num_poor_agents(model) / model.init_people
-    return percentage
 
 
 def get_num_mid_agents(model):
@@ -85,15 +75,11 @@ def get_total_loans(model):
     agent_loans = [a.loans for a in model.schedule.agents]
     # return sum of all agents' loans
     return np.sum(agent_loans)
-  
-      
-def get_poor_percentage(model):
-    percentage = model.init_people / get_num_poor_agents(model)
-    if percentage >= 0.2:
-      return 1
-    else:
-      return 0
 
+def plt_value(model):
+    agent_wealth = [a.wealth for a in model.schedule.agents]
+    all_wealth.append(agent_wealth)
+        
 
 class BankReserves(Model):
     """
@@ -128,7 +114,7 @@ class BankReserves(Model):
         init_people=10,
         rich_threshold=100,
         reserve_percent=10,
-        help_counter = 0,
+        taxation = 10
     ):
         self.height = height
         self.width = width
@@ -138,6 +124,7 @@ class BankReserves(Model):
         # rich_threshold is the amount of savings a person needs to be considered "rich"
         self.rich_threshold = rich_threshold
         self.reserve_percent = reserve_percent
+        self.taxation = taxation
         # see datacollector functions above
         self.datacollector = DataCollector(
             model_reporters={
@@ -148,9 +135,9 @@ class BankReserves(Model):
                 "Wallets": get_total_wallets,
                 "Money": get_total_money,
                 "Loans": get_total_loans,
-                "Percentage": poor_percentage,
+                "Value": plt_value,
             },
-            agent_reporters={"Wealth": lambda x: x.wealth},
+            agent_reporters={"Wealth": "wealth"}
         )
 
         # create a single bank for the model
@@ -161,7 +148,7 @@ class BankReserves(Model):
             # set x, y coords randomly within the grid
             x = self.random.randrange(self.width)
             y = self.random.randrange(self.height)
-            p = Person(i, (x, y), self, True, self.bank, self.rich_threshold)
+            p = Person(i, (x, y), self, True, self.bank, self.rich_threshold, self.taxation)
             # place the Person object on the grid at coordinates (x, y)
             self.grid.place_agent(p, (x, y))
             # add the Person object to the model schedule
@@ -177,9 +164,17 @@ class BankReserves(Model):
         self.schedule.step()
         # collect data
         self.datacollector.collect(self)
-        
-   
+        #self.render()
+        #self deposits
+          
+            
 
     def run_model(self):
-        for i in range(self.run_time):
+        for i in range(self.run_time): 
             self.step()
+           # plt.show()
+            
+            
+            
+        
+ 

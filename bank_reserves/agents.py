@@ -13,6 +13,7 @@ from mesa import Agent
 from bank_reserves.random_walk import RandomWalker
 
 
+
 class Bank(Agent):
     def __init__(self, unique_id, model, reserve_percent=50):
         # initialize the parent class with required parameters
@@ -27,7 +28,8 @@ class Bank(Agent):
         # total amount of deposits in reserve
         self.reserves = (self.reserve_percent / 100) * self.deposits
         # amount the bank is currently able to loan
-        self.bank_to_loan = 0
+        self.bank_to_loan = 1000
+        self.saved_taxes = 0
 
     """update the bank's reserves and amount it can loan;
        this is called every time a person balances their books
@@ -35,12 +37,17 @@ class Bank(Agent):
 
     def bank_balance(self):
         self.reserves = (self.reserve_percent / 100) * self.deposits
-        self.bank_to_loan = self.deposits - (self.reserves + self.bank_loans)
+        if self.bank_to_loan > 300:
+            self.bank_to_loan = self.deposits - (self.reserves + self.bank_loans)
+        else:
+            self.bank_to_loan = self.deposits - (self.reserves + self.bank_loans)
+            self.bank_to_loan += int(1.20*self.saved_taxes)
+
 
 
 # subclass of RandomWalker, which is subclass to Mesa Agent
 class Person(RandomWalker):
-    def __init__(self, unique_id, pos, model, moore, bank, rich_threshold):
+    def __init__(self, unique_id, pos, model, moore, bank, rich_threshold, taxation):
         # init parent class with required parameters
         super().__init__(unique_id, pos, model, moore=moore)
         # the amount each person has in savings
@@ -57,7 +64,7 @@ class Person(RandomWalker):
         # person's bank, set at __init__, all people have the same bank in this model
         self.bank = bank
         #tributo governo
-        self.taxation = self.random.randint(1, 25)
+        self.taxation = taxation
 
     def do_business(self):
         """check if person has any savings, any money in wallet, or if the
@@ -157,27 +164,52 @@ class Person(RandomWalker):
         self.savings -= amount
         # decrease bank deposits
         self.bank.deposits -= amount
-
+        
+        
     # part of balance_books()
     def repay_a_loan(self, amount):
-        # take money from my wallet to pay off all or part of a loan
-        self.loans -= amount - (amount * self.taxation / 100)
+        """# take money from my wallet to pay off all or part of a loan
+        if (int(amount * self.taxation / 100))< 1:
+            self.loans -= amount + 1
+            self.wallet -= amount 
+            # increase the amount the bank can loan right now
+            self.bank.bank_to_loan += amount - 1 
+            # decrease the bank's outstanding loans
+            self.bank.bank_loans -= amount - 1
+            
+            self.bank.saved_taxes += 1
+        else:"""
+        self.loans -= amount + int(amount * self.taxation / 100)
         self.wallet -= amount 
         # increase the amount the bank can loan right now
-        self.bank.bank_to_loan += amount - (amount * self.taxation / 100)
+        self.bank.bank_to_loan += amount - int(amount * self.taxation / 100)
         # decrease the bank's outstanding loans
-        self.bank.bank_loans -= amount - (amount * self.taxation / 100)
+        self.bank.bank_loans -= amount - int(amount * self.taxation / 100)
+        
+        self.bank.saved_taxes += int(amount * self.taxation / 100)
 
     # part of balance_books()
     def take_out_loan(self, amount):
         """borrow from the bank to put money in my wallet, and increase my
-        outstanding loans"""
-        self.loans += amount 
-        self.wallet += amount - (amount * self.taxation / 100)
+        outstanding loans
+        if (int(amount * self.taxation / 100))< 1:
+            self.loans += amount + 1
+            self.wallet += amount 
+            # decresae the amount the bank can loan right now
+            self.bank.bank_to_loan -= amount
+            # increase the bank's outstanding loans
+            self.bank.bank_loans += amount + 1
+            self.bank.saved_taxes += 1
+        else:"""
+        self.loans += amount + int(amount * self.taxation / 100)
+        self.wallet += amount 
         # decresae the amount the bank can loan right now
         self.bank.bank_to_loan -= amount
         # increase the bank's outstanding loans
-        self.bank.bank_loans += amount
+        self.bank.bank_loans += amount + int(amount * self.taxation / 100)
+        self.bank.saved_taxes += int(amount * self.taxation / 100)
+            
+
 
     # step is called for each agent in model.BankReservesModel.schedule.step()
     def step(self):
@@ -189,3 +221,4 @@ class Person(RandomWalker):
         self.balance_books()
         # update the bank's reserves and the amount it can loan right now
         self.bank.bank_balance()
+        
