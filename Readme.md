@@ -33,6 +33,31 @@ Explicação 3 (Colaboração do governo): No sentido contrário da arrecadaçã
 
 OBS: O repositório ainda possui 2 arquivos de modelo, pois uma melhora na ação de crédito do banco é funcional mas estava incompatível com os tipos de dados recebidos no batch_run (provavelmente por ser float).
 
+Step 2:
+
+Será analisada as influências da  "taxation"-imposto (variável de controle), e a influência dos "saved_taxes"-rendimentos(variável independente) do banco no sistema pelo faturamento ou perda das reservas provenientes das taxas.
+
+O Banco começa com uma quantidade de dinheiro razoável ($1000) comparado com a variação de pessoas de 50-150.
+
+O número de passos foi reduzido para 100 ou 200 steps pea quantidade de variações necessarias nas variaveis de controle para atingir os resultados estatísticos relevantes. Embora, o melhor resultado seria com mais steps e as mesmas variações não foi possível pela extensão dos arquivos e a sobrecarga computacional. Nas próximas entregas os processamentos mais longos serão tentados novamente.
+
+A hipótese causal: A influência do banco afeta diretamente a quantidade das classes extremas foi tratada em 3 situações:
+-Governo neutro
+-Governo promotor
+-Governo destrutor 
+
+A forma de devolução implementada foi o retorno do capital de taxas para o capital de empréstimo assim que as reservas bancárias atingem um nível crítico.
+
+A parte de tarifação destina as tarifas acumuladas apenas para o capital de reserva, ou seja, não retornando como capital disponível imediatamente  
+
+Outras variações nas variáveis de controle foram feitas, porém os resultados não foram considerados satisfatórios. O que melhor descreveu as mudanças dentro das tentativas foi:
+
+        "init_people":  [50, 100,150],
+        "rich_threshold" :  [100 ,200],
+        "reserve_percent" :  [10, 20, 30],
+        "taxation" : [10, 20, 30]
+        
+Os arquivos csv gerados forma dividos entre as 3 situaões de Governo e foram realizados testes de correlação 
 
 Execução:
 Se run.py for usado para executar o modelo, a porcentagem de depósitos que o banco deve reter é um parâmetro configurável pelo usuário. O valor que o banco pode emprestar a qualquer momento é uma função do valor dos depósitos, suas reservas e o valor total do empréstimo atual.
